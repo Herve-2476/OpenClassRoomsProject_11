@@ -69,16 +69,19 @@ def create_app(conf):
             flash(f"You do not have enough points to book {placesRequired} places")
         else:
             competition["numberOfPlaces"] = (
-                int(competition["numberOfPlaces"])
-                - placesRequired * POINT_INSCRIPTION_VALUE
+                int(competition["numberOfPlaces"]) - placesRequired
             )
+            club["points"] = (
+                int(club["points"]) - placesRequired * POINT_INSCRIPTION_VALUE
+            )
+
             flash("Great-booking complete!")
         return render_template("welcome.html", club=club, competitions=competitions)
 
     # TODO: Add route for points display
     @app.route("/totalClubPoints")
     def totalClubPoints():
-        return "Hello, World!"
+        return render_template("totalClubPoints.html", clubs=clubs)
 
     @app.route("/logout")
     def logout():

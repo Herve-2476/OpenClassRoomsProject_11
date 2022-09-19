@@ -37,7 +37,6 @@ def client(mocker):
 
 
 class TestServer:
-    # def __init__(self,clubs)
     def test_unknown_valid_email(self, client):
         data = {"email": "unknown_email@gmail.com"}
         response = client.post(
@@ -87,3 +86,14 @@ class TestServer:
         )
         assert response.status_code == 200
         assert response.data.decode().find("You cannot book in past competitions") != -1
+
+    def test_points_not_updated(self, client):
+        data = {"club": "Simply Lift", "competition": "Spring Festival", "places": "4"}
+
+        response = client.post(
+            "/purchasePlaces",
+            data=data,
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert response.data.decode().find("Points available: 1") != -1
