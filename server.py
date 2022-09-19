@@ -35,6 +35,7 @@ def create_app(conf):
             club = [club for club in clubs if club["email"] == request.form["email"]][0]
             return render_template("welcome.html", club=club, competitions=competitions)
         except:
+            flash("Sorry, that email wasn't found.")
             return render_template("index.html")
 
     @app.route("/book/<competition>/<club>")
@@ -56,11 +57,15 @@ def create_app(conf):
         ][0]
         club = [c for c in clubs if c["name"] == request.form["club"]][0]
         placesRequired = int(request.form["places"])
-        if int(club["points"]) < placesRequired * POINT_INSCRIPTION_VALUE:
+        if placesRequired > 12:
+            flash(f"You cannot book more than 12 places")
+
+        elif int(club["points"]) < placesRequired * POINT_INSCRIPTION_VALUE:
             flash(f"You do not have enough points to book {placesRequired} places")
         else:
             competition["numberOfPlaces"] = (
-                int(competition["numberOfPlaces"]) - placesRequired
+                int(competition["numberOfPlaces"])
+                - placesRequired * POINT_INSCRIPTION_VALUE
             )
             flash("Great-booking complete!")
         return render_template("welcome.html", club=club, competitions=competitions)

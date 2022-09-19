@@ -7,7 +7,7 @@ import server
 def client(mocker):
     def mock_loadClubs():
         listOfClubs = [
-            {"name": "Simply Lift", "email": "ohn@simplylift.co", "points": "13"},
+            {"name": "Simply Lift", "email": "john@simplylift.co", "points": "5"},
             {"name": "Iron Temple", "email": "admin@irontemple.com", "points": "4"},
             {"name": "She Lifts", "email": "kate@shelifts.co.uk", "points": "12"},
         ]
@@ -23,7 +23,7 @@ def client(mocker):
             {
                 "name": "Fall Classic",
                 "date": "2020-10-22 13:30:00",
-                "numberOfPlaces": "13",
+                "numberOfPlaces": "5",
             },
         ]
         return listOfCompetitions
@@ -54,7 +54,7 @@ class TestServer:
         )
 
     def test_not_exceed_points_allowed(self, client):
-        data = {"club": "Simply Lift", "competition": "Fall Classic", "places": "14"}
+        data = {"club": "Simply Lift", "competition": "Fall Classic", "places": "6"}
 
         response = client.post(
             "/purchasePlaces",
@@ -65,3 +65,14 @@ class TestServer:
         assert (
             response.data.decode().find("You do not have enough points to book") != -1
         )
+
+    def test_not_book_more_12_places(self, client):
+        data = {"club": "Simply Lift", "competition": "Fall Classic", "places": "13"}
+
+        response = client.post(
+            "/purchasePlaces",
+            data=data,
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert response.data.decode().find("You cannot book more than 12 places") != -1
