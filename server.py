@@ -1,5 +1,6 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
+from datetime import datetime
 
 POINT_INSCRIPTION_VALUE = 1
 
@@ -57,7 +58,11 @@ def create_app(conf):
         ][0]
         club = [c for c in clubs if c["name"] == request.form["club"]][0]
         placesRequired = int(request.form["places"])
-        if placesRequired > 12:
+
+        if datetime.now() > datetime.fromisoformat(competition["date"]):
+            flash(f"You cannot book in past competitions")
+
+        elif placesRequired > 12:
             flash(f"You cannot book more than 12 places")
 
         elif int(club["points"]) < placesRequired * POINT_INSCRIPTION_VALUE:

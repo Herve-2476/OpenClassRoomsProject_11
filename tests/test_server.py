@@ -17,7 +17,7 @@ def client(mocker):
         listOfCompetitions = [
             {
                 "name": "Spring Festival",
-                "date": "2020-03-27 10:00:00",
+                "date": "2023-03-27 10:00:00",
                 "numberOfPlaces": "25",
             },
             {
@@ -54,7 +54,7 @@ class TestServer:
         )
 
     def test_not_exceed_points_allowed(self, client):
-        data = {"club": "Simply Lift", "competition": "Fall Classic", "places": "6"}
+        data = {"club": "Simply Lift", "competition": "Spring Festival", "places": "6"}
 
         response = client.post(
             "/purchasePlaces",
@@ -67,7 +67,7 @@ class TestServer:
         )
 
     def test_not_book_more_12_places(self, client):
-        data = {"club": "Simply Lift", "competition": "Fall Classic", "places": "13"}
+        data = {"club": "Simply Lift", "competition": "Spring Festival", "places": "13"}
 
         response = client.post(
             "/purchasePlaces",
@@ -76,3 +76,14 @@ class TestServer:
         )
         assert response.status_code == 200
         assert response.data.decode().find("You cannot book more than 12 places") != -1
+
+    def test_not_book_past_competition(self, client):
+        data = {"club": "Simply Lift", "competition": "Fall Classic", "places": "4"}
+
+        response = client.post(
+            "/purchasePlaces",
+            data=data,
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert response.data.decode().find("You cannot book in past competitions") != -1
