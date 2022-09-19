@@ -1,7 +1,7 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
 
-POINT_VALUE = 1
+POINT_INSCRIPTION_VALUE = 1
 
 
 def loadClubs():
@@ -56,7 +56,7 @@ def create_app(conf):
         ][0]
         club = [c for c in clubs if c["name"] == request.form["club"]][0]
         placesRequired = int(request.form["places"])
-        if int(club["points"]) < placesRequired:
+        if int(club["points"]) < placesRequired * POINT_INSCRIPTION_VALUE:
             flash(f"You do not have enough points to book {placesRequired} places")
         else:
             competition["numberOfPlaces"] = (
