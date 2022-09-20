@@ -35,7 +35,7 @@ def create_app(conf):
         try:
             club = [club for club in clubs if club["email"] == request.form["email"]][0]
             return render_template("welcome.html", club=club, competitions=competitions)
-        except:
+        except Exception:
             flash("Sorry, that email wasn't found.")
             return render_template("index.html")
 
@@ -60,10 +60,10 @@ def create_app(conf):
         placesRequired = int(request.form["places"])
 
         if datetime.now() > datetime.fromisoformat(competition["date"]):
-            flash(f"You cannot book in past competitions")
+            flash("You cannot book in past competitions")
 
         elif placesRequired > 12:
-            flash(f"You cannot book more than 12 places")
+            flash("You cannot book more than 12 places")
 
         elif int(club["points"]) < placesRequired * POINT_INSCRIPTION_VALUE:
             flash(f"You do not have enough points to book {placesRequired} places")
