@@ -5,26 +5,25 @@ from datetime import datetime
 POINT_INSCRIPTION_VALUE = 1
 
 
-def loadClubs():
-    with open("clubs.json") as c:
+def loadClubs(json_file):
+    with open(json_file) as c:
         listOfClubs = json.load(c)["clubs"]
         return listOfClubs
 
 
-def loadCompetitions():
-    with open("competitions.json") as comps:
+def loadCompetitions(json_file):
+    with open(json_file) as comps:
         listOfCompetitions = json.load(comps)["competitions"]
         return listOfCompetitions
 
 
 def create_app(conf):
     app = Flask(__name__)
-    # app.config.from_object("conf")
     app.config["TESTING"] = conf.get("TESTING")
     app.secret_key = "something_special"
 
-    competitions = loadCompetitions()
-    clubs = loadClubs()
+    competitions = loadCompetitions("competitions.json")
+    clubs = loadClubs("clubs.json")
 
     @app.route("/")
     def index():
@@ -36,13 +35,18 @@ def create_app(conf):
             club = [club for club in clubs if club["email"] == request.form["email"]][0]
             return render_template("welcome.html", club=club, competitions=competitions)
         except Exception:
-            flash("Sorry, that email wasn't found.")
+            flash("Sorry, that email was not found.")
             return render_template("index.html")
 
     @app.route("/book/<competition>/<club>")
     def book(competition, club):
-        foundClub = [c for c in clubs if c["name"] == club][0]
-        foundCompetition = [c for c in competitions if c["name"] == competition][0]
+        try:
+            foundClub = [c for c in clubs if c["name"] == club][0]
+            foundCompetition = [c for c in competitions if c["name"] == competition][0]
+        except Exception:
+            flash("competition or/and club are not valid")
+            return redirect("/")
+
         if foundClub and foundCompetition:
             return render_template(
                 "booking.html", club=foundClub, competition=foundCompetition
