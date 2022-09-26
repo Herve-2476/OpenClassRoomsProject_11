@@ -45,7 +45,7 @@ class TestServer:
             follow_redirects=True,
         )
         assert response.status_code == 200
-        assert response.data.decode().find("Sorry, that email was not found.") != -1
+        assert response.data.decode().find("Sorry, that email was not found") != -1
 
     def test_known_email(self, client):
         data = {"email": "john@simplylift.co"}

@@ -2,7 +2,7 @@ import json
 from flask import Flask, render_template, request, redirect, flash, url_for
 from datetime import datetime
 
-POINT_INSCRIPTION_VALUE = 1
+POINT_INSCRIPTION_VALUE = 3
 
 
 def loadClubs(json_file):
@@ -34,8 +34,8 @@ def create_app(conf):
         try:
             club = [club for club in clubs if club["email"] == request.form["email"]][0]
             return render_template("welcome.html", club=club, competitions=competitions)
-        except Exception:
-            flash("Sorry, that email was not found.")
+        except IndexError:
+            flash("Sorry, that email was not found")
             return render_template("index.html")
 
     @app.route("/book/<competition>/<club>")
@@ -43,7 +43,7 @@ def create_app(conf):
         try:
             foundClub = [c for c in clubs if c["name"] == club][0]
             foundCompetition = [c for c in competitions if c["name"] == competition][0]
-        except Exception:
+        except IndexError:
             flash("competition or/and club are not valid")
             return redirect("/")
 
@@ -70,7 +70,10 @@ def create_app(conf):
             flash("You cannot book more than 12 places")
 
         elif int(club["points"]) < placesRequired * POINT_INSCRIPTION_VALUE:
-            flash(f"You do not have enough points to book {placesRequired} places")
+            flash(
+                f"""You do not have enough points to book {placesRequired} places
+                 ( {POINT_INSCRIPTION_VALUE} points per place )"""
+            )
         else:
             competition["numberOfPlaces"] = (
                 int(competition["numberOfPlaces"]) - placesRequired
