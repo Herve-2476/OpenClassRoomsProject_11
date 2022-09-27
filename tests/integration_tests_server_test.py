@@ -1,6 +1,3 @@
-from .unit_tests_server_test import client
-
-
 def test_path(client):
 
     """
@@ -79,6 +76,3 @@ def test_path(client):
         )
         != -1
     )
-
-
-type(client)  # pour flake8 !!
